@@ -1,0 +1,1 @@
+wget -qO - http://ngrams.googlelabs.com/datasets | grep -E href='(.+eng-all-3gram.+\.zip)' | sed -r "s/.*href='(.+\.zip)'.*/\1/" | uniq | while read line; do `wget $line`; echo $line; done

@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+
+#Code from http://unix.stackexchange.com/questions/15521/combine-input-from-multiple-files-pipes-without-clobbering-lines-or-blocking by Gilles
+
+import Queue, itertools, os, subprocess, sys, threading
+# Queue of (producer_id, line). line==None indicates the end of a producer.
+lq = Queue.Queue()
+
+# Line producer
+def run_task(i, cmd):
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+    line = p.stdout.readline()
+    while line <> "":
+        lq.put((i, line))
+        line = p.stdout.readline()
+    lq.put((i, None))
+
+# Start a producer for each command passed as an argument
+for i in range(1,len(sys.argv)):
+    threading.Thread(target=run_task, args=(i, sys.argv[i])).start()
+sources = len(sys.argv) - 1
+# Consumer: print lines as they come in, until no producer is left.
+while sources > 0:
+    (k, line) = lq.get()
+    if line == None: sources -= 1
+    else: sys.stdout.write(str(k) + ":" + line)

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#This is an extremely simple script to collate a number of files together.
+#It will read one line from each of the files in turn
+#It's significantly faster than programmatic ways of managing pipes in perl and python.
+
+
+#Once a file is done, it moves on to the remaining ones: blank lines are skipped for that reason.
+
+paste -d "\n" "$@" | grep -v "^$"
